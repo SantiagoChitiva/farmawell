@@ -5,9 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.farmawell.dto.excel.VentaExcelDTO;
-import com.example.farmawell.entity.Cliente;
-import com.example.farmawell.entity.Producto;
-import com.example.farmawell.entity.Venta;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,44 +12,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImportacionService {
 
-    private final ClienteService clienteService;
-    private final ProductoService productoService;
-    private final VentaService ventaService;
-    private final DetalleVentaService detalleVentaService;
+    private final ImportacionBatchService batchService;
+    private static final int TAMANO_LOTE = 1000;
 
     public void importar(List<VentaExcelDTO> ventas) {
-
-    int contador = 0;
-
-    int limite = Math.min(ventas.size(), 5000);
-
-    for (int i = 0; i < limite; i++) {
-
-        VentaExcelDTO dto = ventas.get(i);
-
-        Cliente cliente = clienteService.obtenerOCrear(dto);
-
-        Producto producto = productoService.obtenerOCrear(dto);
-
-        Venta venta = ventaService.obtenerOCrear(dto, cliente);
-
-        detalleVentaService.guardar(
-                venta,
-                producto,
-                dto
-        );
-
-        contador++;
-
-        if (contador % 1000 == 0) {
-            System.out.println(
-                    contador + " registros procesados"
-            );
+        int total = ventas.size();
+        for (int i = 0; i < total; i += TAMANO_LOTE) {
+            int fin = Math.min(i + TAMANO_LOTE, total);
+            batchService.procesarLote(ventas.subList(i, fin));
+            System.out.println((fin) + "/" + total + " registros procesados");
         }
+        System.out.println("Importación terminada.");
     }
-
-    detalleVentaService.finalizar();
-
-    System.out.println("Importación terminada.");
-}
 }

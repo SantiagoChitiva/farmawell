@@ -8,10 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.farmawell.dto.dashboard.ClienteInactivoDTO;
+import com.example.farmawell.dto.dashboard.ClienteNuevoMesDTO;
+import com.example.farmawell.dto.dashboard.ClientePerdidoMesDTO;
 import com.example.farmawell.dto.dashboard.ClienteVipDTO;
 import com.example.farmawell.dto.dashboard.DashboardResumenDTO;
+import com.example.farmawell.dto.dashboard.TicketPromedioMensualDTO;
 import com.example.farmawell.dto.dashboard.TopClienteDTO;
 import com.example.farmawell.dto.dashboard.TopProductoDTO;
+import com.example.farmawell.dto.dashboard.VentaCategoriaDTO;
+import com.example.farmawell.dto.dashboard.VentaCiudadDTO;
+import com.example.farmawell.dto.dashboard.VentaMarcaDTO;
+import com.example.farmawell.dto.dashboard.VentaMesDTO;
+import com.example.farmawell.dto.dashboard.VentaSedeDTO;
 import com.example.farmawell.repository.ClienteRepository;
 import com.example.farmawell.repository.DetalleVentaRepository;
 import com.example.farmawell.repository.ProductoRepository;
@@ -97,6 +105,103 @@ public List<ClienteVipDTO> obtenerClientesVip(int limite){
                     c.getNombre(),
                     c.getTelefono(),
                     c.getTotalComprado()))
+            .toList();
+
+}
+
+public List<VentaMesDTO> obtenerVentasPorMes(){
+
+    return ventaRepository
+            .obtenerVentasPorMes()
+            .stream()
+            .map(p -> new VentaMesDTO(
+                    p.getMes(),
+                    p.getTotalVentas(),
+                    p.getCantidadFacturas()))
+            .toList();
+
+}
+
+public List<VentaSedeDTO> obtenerVentasPorSede(){
+
+    return ventaRepository
+            .obtenerVentasPorSede()
+            .stream()
+            .map(p -> new VentaSedeDTO(
+                    p.getSede(),
+                    p.getTotalVentas()))
+            .toList();
+
+}
+
+public List<VentaCiudadDTO> obtenerVentasPorCiudad(){
+
+    return ventaRepository
+            .obtenerVentasPorCiudad()
+            .stream()
+            .map(p -> new VentaCiudadDTO(
+                    p.getCiudad(),
+                    p.getTotalVentas()))
+            .toList();
+
+}
+
+public List<VentaCategoriaDTO> obtenerVentasPorCategoria(){
+
+    return detalleVentaRepository
+            .obtenerVentasPorCategoria()
+            .stream()
+            .map(p -> new VentaCategoriaDTO(
+                    p.getCategoria(),
+                    p.getTotalVentas()))
+            .toList();
+
+}
+
+public List<VentaMarcaDTO> obtenerVentasPorMarca(){
+
+    return detalleVentaRepository
+            .obtenerVentasPorMarca()
+            .stream()
+            .map(p -> new VentaMarcaDTO(
+                    p.getMarca(),
+                    p.getTotalVentas()))
+            .toList();
+
+}
+
+public List<TicketPromedioMensualDTO> obtenerTicketPromedioMensual(){
+
+    return ventaRepository
+            .obtenerTicketPromedioMensual()
+            .stream()
+            .map(p -> new TicketPromedioMensualDTO(
+                    p.getMes(),
+                    p.getTicketPromedio()))
+            .toList();
+
+}
+
+public List<ClienteNuevoMesDTO> obtenerClientesNuevosPorMes(){
+
+    return ventaRepository
+            .obtenerClientesNuevosPorMes()
+            .stream()
+            .map(p -> new ClienteNuevoMesDTO(
+                    p.getMes(),
+                    p.getCantidad()))
+            .toList();
+
+}
+
+public List<ClientePerdidoMesDTO> obtenerClientesPerdidosPorMes(){
+
+    return ventaRepository
+            .obtenerClientesPerdidosPorMes()
+            .stream()
+            .map(p -> new ClientePerdidoMesDTO(
+                    p.getMes(),
+                    p.getCantidad()))
             .toList();
 
 }

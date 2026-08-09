@@ -13,6 +13,9 @@ import com.example.farmawell.service.RecomendacionService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import com.example.farmawell.dto.dashboard.ProductoAfinidadDTO;
+
 @RestController
 @RequestMapping("/recomendaciones")
 @RequiredArgsConstructor
@@ -32,6 +35,15 @@ public class RecomendacionController {
             @PathVariable String codigo){
 
         return service.clientesInteresados(codigo);
+
+    }
+
+    @GetMapping("/afinidad/{codigo}")
+    public List<ProductoAfinidadDTO> afinidad(
+            @PathVariable String codigo,
+            @RequestParam(defaultValue = "10") int limite){
+
+        return service.obtenerAfinidad(codigo, limite);
 
     }
 

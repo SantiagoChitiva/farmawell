@@ -11,10 +11,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.example.farmawell.entity.Venta;
 import com.example.farmawell.projection.ClienteInactivoProjection;
+import com.example.farmawell.projection.ClienteNuevoMesProjection;
+import com.example.farmawell.projection.ClientePerdidoMesProjection;
 import com.example.farmawell.projection.ClienteSegmentadoProjection;
 import com.example.farmawell.projection.ClienteVipProjection;
 import com.example.farmawell.projection.HistorialCompraProjection;
+import com.example.farmawell.projection.TicketPromedioMensualProjection;
 import com.example.farmawell.projection.TopClienteProjection;
+import com.example.farmawell.projection.VentaCiudadProjection;
+import com.example.farmawell.projection.VentaMesProjection;
+import com.example.farmawell.projection.VentaSedeProjection;
 
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
@@ -133,5 +139,76 @@ v.total
 ORDER BY v.fecha DESC
 """)
 List<HistorialCompraProjection> historialCliente(String codigo);
+
+@Query(value = """
+SELECT
+    TO_CHAR(fecha, 'YYYY-MM') AS mes,
+    SUM(total) AS totalVentas,
+    COUNT(*) AS cantidadFacturas
+FROM ventas
+GROUP BY mes
+ORDER BY mes
+""", nativeQuery = true)
+List<VentaMesProjection> obtenerVentasPorMes();
+
+@Query(value = """
+SELECT
+    sede AS sede,
+    SUM(total) AS totalVentas
+FROM ventas
+GROUP BY sede
+ORDER BY totalVentas DESC
+""", nativeQuery = true)
+List<VentaSedeProjection> obtenerVentasPorSede();
+
+@Query(value = """
+SELECT
+    c.ciudad AS ciudad,
+    SUM(v.total) AS totalVentas
+FROM ventas v
+JOIN clientes c ON c.id = v.cliente_id
+GROUP BY c.ciudad
+ORDER BY totalVentas DESC
+""", nativeQuery = true)
+List<VentaCiudadProjection> obtenerVentasPorCiudad();
+
+@Query(value = """
+SELECT
+    TO_CHAR(fecha, 'YYYY-MM') AS mes,
+    AVG(total) AS ticketPromedio
+FROM ventas
+GROUP BY mes
+ORDER BY mes
+""", nativeQuery = true)
+List<TicketPromedioMensualProjection> obtenerTicketPromedioMensual();
+
+@Query(value = """
+SELECT
+    TO_CHAR(primera_compra, 'YYYY-MM') AS mes,
+    COUNT(*) AS cantidad
+FROM (
+    SELECT cliente_id, MIN(fecha) AS primera_compra
+    FROM ventas
+    GROUP BY cliente_id
+) t
+GROUP BY mes
+ORDER BY mes
+""", nativeQuery = true)
+List<ClienteNuevoMesProjection> obtenerClientesNuevosPorMes();
+
+@Query(value = """
+SELECT
+    TO_CHAR(ultima_compra, 'YYYY-MM') AS mes,
+    COUNT(*) AS cantidad
+FROM (
+    SELECT cliente_id, MAX(fecha) AS ultima_compra
+    FROM ventas
+    GROUP BY cliente_id
+) t
+WHERE ultima_compra <= CURRENT_DATE - INTERVAL '180 days'
+GROUP BY mes
+ORDER BY mes
+""", nativeQuery = true)
+List<ClientePerdidoMesProjection> obtenerClientesPerdidosPorMes();
 
 }

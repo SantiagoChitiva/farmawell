@@ -24,7 +24,7 @@ public final class ExcelColumns {
     public static final int DESCRIPCION = 12;
     public static final int GRUPO_ARTICULO = 14;
     public static final int LINEA = 26;
-    public static final int MARCA = 42;
+    public static final int MARCA = 11;
 
     // Valores
     public static final int CANTIDAD = 16;

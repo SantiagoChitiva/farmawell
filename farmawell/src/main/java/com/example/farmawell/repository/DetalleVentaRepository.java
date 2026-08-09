@@ -11,7 +11,10 @@ import com.example.farmawell.dto.dashboard.ClienteProductoDTO;
 import com.example.farmawell.dto.dashboard.ProductoFavoritoDTO;
 import com.example.farmawell.entity.DetalleVenta;
 import com.example.farmawell.projection.DetalleCompraProjection;
+import com.example.farmawell.projection.ProductoAfinidadProjection;
 import com.example.farmawell.projection.TopProductoProjection;
+import com.example.farmawell.projection.VentaCategoriaProjection;
+import com.example.farmawell.projection.VentaMarcaProjection;
 
 public interface DetalleVentaRepository extends JpaRepository<DetalleVenta, Long> {
 @Query("""
@@ -88,4 +91,46 @@ JOIN d.producto p
 WHERE d.venta.numeroFactura = :factura
 """)
 List<DetalleCompraProjection> detalleFactura(String factura);
+
+@Query("""
+SELECT
+    p.grupoArticulo AS categoria,
+    SUM(d.subtotal) AS totalVentas
+FROM DetalleVenta d
+JOIN d.producto p
+GROUP BY p.grupoArticulo
+ORDER BY SUM(d.subtotal) DESC
+""")
+List<VentaCategoriaProjection> obtenerVentasPorCategoria();
+
+@Query("""
+SELECT
+    p.marca AS marca,
+    SUM(d.subtotal) AS totalVentas
+FROM DetalleVenta d
+JOIN d.producto p
+GROUP BY p.marca
+ORDER BY SUM(d.subtotal) DESC
+""")
+List<VentaMarcaProjection> obtenerVentasPorMarca();
+
+@Query("""
+SELECT
+    p2.codigoTns AS codigoProducto,
+    p2.descripcion AS descripcion,
+    p2.marca AS marca,
+    COUNT(d2) AS vecesJuntos
+FROM DetalleVenta d1, DetalleVenta d2
+JOIN d1.producto p1
+JOIN d2.producto p2
+WHERE d1.venta = d2.venta
+  AND p1.codigoTns = :codigoProducto
+  AND p2.codigoTns <> :codigoProducto
+GROUP BY p2.codigoTns, p2.descripcion, p2.marca
+ORDER BY COUNT(d2) DESC
+""")
+List<ProductoAfinidadProjection> obtenerProductosAfines(
+        @Param("codigoProducto") String codigoProducto,
+        Pageable pageable);
+
 }
