@@ -1,7 +1,10 @@
 package com.example.farmawell.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.example.farmawell.dto.dashboard.ProductoBusquedaDTO;
 import com.example.farmawell.dto.excel.VentaExcelDTO;
 import com.example.farmawell.entity.Producto;
 import com.example.farmawell.repository.ProductoRepository;
@@ -54,5 +57,17 @@ public class ProductoService {
         cache.getProductos().put(codigo, producto);
 
         return producto;
+    }
+
+    public List<ProductoBusquedaDTO> buscarPorNombre(String texto) {
+
+        return productoRepository
+                .findTop10ByDescripcionContainingIgnoreCase(texto)
+                .stream()
+                .map(p -> new ProductoBusquedaDTO(
+                        p.getCodigoTns(),
+                        p.getDescripcion(),
+                        p.getMarca()))
+                .toList();
     }
 }
