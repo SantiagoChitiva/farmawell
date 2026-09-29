@@ -4,8 +4,13 @@ import com.example.farmawell.dto.excel.VentaExcelDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.List;
 import com.example.farmawell.importer.ExcelImporter;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 
 @Service
@@ -26,6 +31,9 @@ public class ImportacionAsyncService {
             estado = "TERMINADO";
         } catch (Exception e) {
             estado = "ERROR: " + e.getMessage();
+        }
+        finally {
+            try { Files.deleteIfExists(Path.of(ruta)); } catch (IOException ignorado) { }
         }
     }
 

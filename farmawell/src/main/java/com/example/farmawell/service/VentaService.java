@@ -30,7 +30,7 @@ public class VentaService {
 
         factura = factura.trim();
 
-        // 1. Buscar primero en memoria
+        // 1. Buscar primero en memori
         Venta venta = cache.getVentas().get(factura);
 
         if (venta != null) {

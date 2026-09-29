@@ -34,7 +34,7 @@ build/
 
 
 # Datos privados
-excel/
+/excel/
 *.xlsx
 *.xls
 
